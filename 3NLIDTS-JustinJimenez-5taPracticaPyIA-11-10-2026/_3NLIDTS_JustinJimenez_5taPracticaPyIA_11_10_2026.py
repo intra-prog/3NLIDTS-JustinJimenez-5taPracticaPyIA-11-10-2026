@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import re
-
+from datetime import datetime
 
 def EnteroValido(valor):
     try:
@@ -25,12 +25,19 @@ def TextoValido(valor):
     return bool(re.match("^[a-zA-Z\\s]+$", valor))
 
 def borrar():
-    tbNombre.delete(0, tk.END)
-    tbApellidos.delete(0, tk.END)
-    tbEdad.delete(0, tk.END)
-    tbTelefono.delete(0, tk.END)
-    tbEstatura.delete(0, tk.END)
-    rbSeleccionGenero.set(0)
+    # Mejora 1: Cuadro modal de confirmación preventiva
+    confirmacion = messagebox.askyesno(
+        "Confirmar limpieza",
+        "¿Está seguro de que desea limpiar todos los campos del formulario?"
+    )
+    if confirmacion:
+        tbNombre.delete(0, tk.END)
+        tbApellidos.delete(0, tk.END)
+        tbEdad.delete(0, tk.END)
+        tbTelefono.delete(0, tk.END)
+        tbEstatura.delete(0, tk.END)
+        rbSeleccionGenero.set(0)
+        tbNombre.focus()
 
 def guardar():
     nombres = tbNombre.get()
@@ -50,15 +57,22 @@ def guardar():
     if (EnteroValido(edad) and DecimalValido(estatura) and
         TelefonoValido(tel) and TextoValido(nombres) and
         TextoValido(apellidos)):
-        datos = ("Nombre: " + nombres + "\n" +
+        
+        # Mejora 2: Registro con marca temporal de fecha y hora
+        fecha_registro = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        datos = ("Fecha y Hora: " + fecha_registro + "\n" +
+                 "Nombre: " + nombres + "\n" +
                  "Apellidos: " + apellidos + "\n" +
                  "Edad: " + edad + "\n" +
                  "Telefono: " + tel + "\n" +
                  "Estatura: " + estatura + "\n" +
                  "Genero: " + genero)
-        with open("Datos3D_13Feb26.txt", "a") as archivo:
+        
+        ruta = r"C:\Users\omnib\OneDrive\Documents\Datos3D_13Feb26.txt"
+        with open(ruta, "a", encoding="utf-8") as archivo:
             archivo.write(datos + "\n\n")
-        messagebox.showinfo("Informacion", "Datos guardados correctamente \n" + datos)
+            
+        messagebox.showinfo("Informacion", "Datos guardados correctamente \n\n" + datos)
     else:
         messagebox.showerror("Error", "Algunos de los campos tienen Formato equivocado")
 
@@ -106,5 +120,3 @@ btnBorrar = tk.Button(gb2, text="Borrar", width=10, padx=10, pady=8, command=bor
 btnBorrar.grid(column=2, row=1)
 
 ventana.mainloop()
-
-
